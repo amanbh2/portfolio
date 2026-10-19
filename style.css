@@ -90,6 +90,27 @@
     --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html[data-theme="daylight"] {
+    --accent-glow: #0284c7;       /* Precision Sky Blue */
+    --accent-sub: #0369a1;
+    --accent-secondary: #0d9488; /* Emerald Teal */
+    --accent-tertiary: #4f46e5;  /* Deep Indigo */
+    --grad-accent: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+    --bg-deep: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-card-hover: rgba(255, 255, 255, 0.98);
+    --bg-inner: rgba(241, 245, 249, 0.85);
+    --border-glass: rgba(15, 23, 42, 0.1);
+    --border-glass-bright: rgba(2, 132, 199, 0.45);
+    --watermark-color: #0284c7;
+    --text-white: #0f172a;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+}
+
 /* --------------------------------------------------------------------------
    2. Global Reset & Layout
    -------------------------------------------------------------------------- */
@@ -512,6 +533,7 @@ body {
 .dot-aurora { background: #00f5a0; box-shadow: 0 0 8px #00f5a0; }
 .dot-tactical { background: #ff6b00; box-shadow: 0 0 8px #ff6b00; }
 .dot-cyber { background: #00f2fe; box-shadow: 0 0 8px #00f2fe; }
+.dot-daylight { background: #0284c7; box-shadow: 0 0 8px #0284c7; }
 
 .theme-badge {
     margin-left: auto;
@@ -526,13 +548,14 @@ body {
 .hamburger {
     display: none;
     flex-direction: column;
-    justify-content: space-around;
-    width: 30px;
-    height: 24px;
+    justify-content: space-between;
+    width: 26px;
+    height: 18px;
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 0;
+    z-index: 101;
 }
 
 .hamburger span {
@@ -540,7 +563,33 @@ body {
     height: 2px;
     background: var(--text-white);
     border-radius: 2px;
-    transition: all var(--transition-fast);
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.hamburger.is-active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.is-active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.is-active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.mobile-nav-extras {
+    display: none;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    width: 100%;
+}
+
+.mobile-drawer-resume {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -1297,61 +1346,47 @@ body {
     font-weight: 600;
 }
 
-.experience-subsections {
+.experience-card-body {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 1.25rem;
 }
 
-.exp-pillar {
-    transition: transform var(--transition-fast), border-color var(--transition-fast);
-}
-
-.exp-pillar:hover {
-    border-color: var(--border-glass-bright);
-    transform: translateX(4px);
-}
-
-.pillar-head {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.85rem;
-}
-
-.pillar-icon {
-    font-size: 1.25rem;
-}
-
-.pillar-title {
-    font-family: var(--font-heading);
-    font-size: 1.12rem;
-    font-weight: 700;
-    color: var(--text-white);
-}
-
-.pillar-points {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-}
-
-.pillar-points li {
-    position: relative;
-    padding-left: 1.35rem;
-    font-size: 0.92rem;
+.role-overview-text {
+    font-size: 0.96rem;
+    line-height: 1.7;
     color: var(--text-primary);
-    line-height: 1.6;
 }
 
-.pillar-points li::before {
-    content: "•";
-    position: absolute;
-    left: 0.25rem;
+.role-focus-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.focus-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass-bright);
+    border-radius: var(--border-radius-pill);
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
     color: var(--accent-glow);
-    font-size: 1.2rem;
-    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all var(--transition-fast);
+}
+
+.focus-pill:hover {
+    background: var(--accent-glow);
+    color: #060b14;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--border-glass-bright);
 }
 
 /* --------------------------------------------------------------------------
@@ -2199,26 +2234,35 @@ body {
 }
 
 @media (max-width: 768px) {
+    .navbar-wrapper {
+        top: 0.75rem;
+        padding: 0 1rem;
+    }
+
     .navbar {
         border-radius: var(--border-radius-md);
+        padding: 0.6rem 0.9rem;
     }
 
     .nav-links {
         position: fixed;
         top: 4.5rem;
-        left: 1.5rem;
-        right: 1.5rem;
-        background: rgba(12, 18, 32, 0.98);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        left: 1rem;
+        right: 1rem;
+        background: rgba(12, 18, 32, 0.97);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: var(--border-radius-lg);
         flex-direction: column;
-        padding: 2rem;
+        padding: 1.8rem 1.5rem;
         gap: 1.25rem;
         opacity: 0;
         visibility: hidden;
-        transform: translateY(-20px);
+        transform: translateY(-16px);
         transition: all var(--transition-normal);
+        z-index: 1000;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
     }
 
     .nav-links.mobile-open {
@@ -2227,17 +2271,36 @@ body {
         transform: translateY(0);
     }
 
+    .mobile-nav-extras {
+        display: block;
+    }
+
+    /* Hide the navbar resume button on mobile header to avoid cramming */
+    #nav-resume-btn {
+        display: none;
+    }
+
     .hamburger {
         display: flex;
+    }
+
+    .hero-section {
+        padding-top: 6.5rem;
+        padding-bottom: 3rem;
     }
 
     .hero-title {
         font-size: 2.2rem;
     }
 
+    .floating-telemetry {
+        display: none;
+    }
+
     .metrics-bar {
         flex-direction: column;
         gap: 1.25rem;
+        padding: 1.5rem 1rem;
     }
 
     .metric-divider {
@@ -2245,19 +2308,14 @@ body {
     }
 
     .timeline-item {
-        padding-left: 1.5rem;
+        padding-left: 0;
     }
 
     .timeline-marker {
         display: none;
     }
 
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .footer-left {
+    .india-map-container {
         max-width: 100%;
     }
 
@@ -2265,4 +2323,327 @@ body {
         height: 85vh;
         width: 95%;
     }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .footer-left {
+        max-width: 100%;
+    }
+
+    .footer-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 15px;
+    }
+
+    .section {
+        padding: 3.5rem 0;
+    }
+
+    .section-title {
+        font-size: 1.85rem;
+    }
+
+    .hero-title {
+        font-size: 1.95rem;
+    }
+
+    .hero-cta-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .hero-cta-group .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .submodules-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chips-container {
+        gap: 0.4rem;
+    }
+
+    .radar-stats {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .role-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .contact-form {
+        padding: 1.25rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   16. Daylight Crisp (Light Mode) Detailed Styles
+   -------------------------------------------------------------------------- */
+html[data-theme="daylight"] body {
+    background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.07) 0%, transparent 70%), #f8fafc;
+}
+
+html[data-theme="daylight"] .bg-watermark {
+    opacity: 0.06;
+}
+
+html[data-theme="daylight"] .glass-card {
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+
+html[data-theme="daylight"] .glass-card:hover {
+    box-shadow: 0 15px 35px -5px rgba(2, 132, 199, 0.15), 0 0 15px -2px rgba(2, 132, 199, 0.25);
+    border-color: var(--border-glass-bright);
+}
+
+html[data-theme="daylight"] .glass-inner {
+    border-color: rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="daylight"] .floating-telemetry {
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(2, 132, 199, 0.3);
+    color: #0f172a;
+    box-shadow: 0 6px 15px rgba(15, 23, 42, 0.1);
+}
+
+html[data-theme="daylight"] .navbar {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="daylight"] .nav-link {
+    color: var(--text-secondary);
+}
+
+html[data-theme="daylight"] .nav-link:hover,
+html[data-theme="daylight"] .nav-link.active {
+    color: #0f172a;
+}
+
+html[data-theme="daylight"] .nav-links {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(15, 23, 42, 0.12);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="daylight"] .btn-primary {
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+}
+
+html[data-theme="daylight"] .btn-secondary {
+    background: rgba(15, 23, 42, 0.05);
+    color: #0f172a;
+    border-color: rgba(15, 23, 42, 0.15);
+}
+
+html[data-theme="daylight"] .btn-secondary:hover {
+    background: rgba(2, 132, 199, 0.1);
+    border-color: var(--accent-glow);
+    color: var(--accent-glow);
+}
+
+html[data-theme="daylight"] .btn-icon {
+    background: rgba(15, 23, 42, 0.05);
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #0f172a;
+}
+
+html[data-theme="daylight"] .btn-accent {
+    background: rgba(2, 132, 199, 0.08);
+    border-color: rgba(2, 132, 199, 0.3);
+    color: var(--accent-glow);
+}
+
+html[data-theme="daylight"] .btn-accent:hover {
+    background: var(--accent-glow);
+    color: #ffffff;
+}
+
+html[data-theme="daylight"] .badge-tag {
+    background: rgba(2, 132, 199, 0.08);
+    border-color: rgba(2, 132, 199, 0.25);
+}
+
+html[data-theme="daylight"] .theme-dropdown {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(15, 23, 42, 0.12);
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
+}
+
+html[data-theme="daylight"] .theme-dropdown-header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="daylight"] .theme-opt {
+    color: #1e293b;
+}
+
+html[data-theme="daylight"] .theme-opt:hover {
+    background: rgba(2, 132, 199, 0.08);
+    color: #0284c7;
+}
+
+html[data-theme="daylight"] .theme-opt.active {
+    background: rgba(2, 132, 199, 0.12);
+    color: #0284c7;
+}
+
+html[data-theme="daylight"] .theme-badge {
+    color: #ffffff;
+}
+
+html[data-theme="daylight"] .hamburger span {
+    background: #0f172a;
+}
+
+html[data-theme="daylight"] .map-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="daylight"] .map-header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="daylight"] .india-state {
+    fill: rgba(15, 23, 42, 0.035);
+    stroke: rgba(15, 23, 42, 0.18);
+}
+
+html[data-theme="daylight"] .india-state:hover {
+    fill: rgba(2, 132, 199, 0.12);
+    stroke: var(--accent-glow);
+}
+
+html[data-theme="daylight"] .india-state#INBR,
+html[data-theme="daylight"] .india-state#INCT,
+html[data-theme="daylight"] .india-state#INKA,
+html[data-theme="daylight"] .india-state#INHR,
+html[data-theme="daylight"] .india-state#INDL {
+    fill: rgba(2, 132, 199, 0.14);
+    stroke: var(--accent-glow);
+}
+
+html[data-theme="daylight"] .arch-block {
+    background: rgba(241, 245, 249, 0.7);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="daylight"] .cu-cp-block {
+    background: linear-gradient(180deg, rgba(2, 132, 199, 0.04) 0%, rgba(241, 245, 249, 0.8) 100%);
+    border-color: rgba(2, 132, 199, 0.35);
+}
+
+html[data-theme="daylight"] .module-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.1);
+}
+
+html[data-theme="daylight"] .module-btn:hover,
+html[data-theme="daylight"] .module-btn.active {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--accent-glow);
+    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+}
+
+html[data-theme="daylight"] .stat-pill {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+html[data-theme="daylight"] .radar-stats {
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="daylight"] .skill-pill {
+    background: rgba(15, 23, 42, 0.04);
+    border-color: rgba(15, 23, 42, 0.1);
+    color: #1e293b;
+}
+
+html[data-theme="daylight"] .skill-pill.highlight {
+    background: rgba(2, 132, 199, 0.1);
+    border-color: rgba(2, 132, 199, 0.3);
+    color: #0284c7;
+}
+
+html[data-theme="daylight"] .terminal-window {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.15);
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2), 0 0 20px rgba(2, 132, 199, 0.2);
+}
+
+html[data-theme="daylight"] .terminal-header {
+    background: #e2e8f0;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+html[data-theme="daylight"] .terminal-screen {
+    color: #1e293b;
+    background: #f8fafc;
+}
+
+html[data-theme="daylight"] .terminal-input-row {
+    background: #edf2f7;
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+html[data-theme="daylight"] .term-input {
+    color: #0f172a;
+}
+
+html[data-theme="daylight"] .footer {
+    background: #f1f5f9;
+    border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="daylight"] .back-to-top {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #0f172a;
+}
+
+html[data-theme="daylight"] .back-to-top:hover {
+    background: var(--accent-glow);
+    color: #ffffff;
+}
+
+html[data-theme="daylight"] .form-input {
+    background: rgba(241, 245, 249, 0.8);
+    border-color: rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+}
+
+html[data-theme="daylight"] .form-input:focus {
+    background: #ffffff;
+    border-color: var(--accent-glow);
+}
+
+html[data-theme="daylight"] .focus-pill {
+    background: rgba(2, 132, 199, 0.08);
+    border-color: rgba(2, 132, 199, 0.25);
+    color: #0284c7;
+}
+
+html[data-theme="daylight"] .focus-pill:hover {
+    background: #0284c7;
+    color: #ffffff;
 }

@@ -123,7 +123,6 @@ function initThemeEngine() {
    ========================================================================== */
 function renderDynamicContent() {
     renderMetrics();
-    renderExperiencePillars();
     renderSkillsGrid();
 }
 
@@ -744,14 +743,24 @@ function initMobileNav() {
 
     if (!hamburger || !navLinks) return;
 
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('mobile-open');
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = navLinks.classList.toggle('mobile-open');
+        hamburger.classList.toggle('is-active', isOpen);
     });
 
     navLinks.querySelectorAll('.nav-link').forEach((link) => {
         link.addEventListener('click', () => {
             navLinks.classList.remove('mobile-open');
+            hamburger.classList.remove('is-active');
         });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+            navLinks.classList.remove('mobile-open');
+            hamburger.classList.remove('is-active');
+        }
     });
 }
 

@@ -93,6 +93,12 @@ const PORTFOLIO_DATA = {
             accent: "#00f2fe",
             secondary: "#8b5cf6",
             desc: "High-Frequency 5G Carrier Beam Cyan"
+        },
+        daylight: {
+            name: "Daylight Crisp",
+            accent: "#0284c7",
+            secondary: "#0d9488",
+            desc: "Clean High-Contrast Studio Light"
         }
     },
 
