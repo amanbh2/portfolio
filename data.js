@@ -302,13 +302,79 @@ const PORTFOLIO_DATA = {
         }
     ],
 
-    // Separate verified credentials (uncoupled from awards)
+    // Featured Web Applications & Projects
+    projects: [
+        {
+            id: "learning",
+            title: "Learning Hub",
+            badge: "5G RAN & Systems Knowledge Base",
+            category: "Technical Knowledge Platform",
+            icon: "📚",
+            liveUrl: "https://amanbh2.github.io/learning/",
+            description: "A structured engineering knowledge base covering 5G RAN architecture, C++, Linux IPC, and telecom protocol stacks designed for in-depth technical mastery and interview readiness.",
+            tags: ["5G RAN", "C++", "Networking", "Markdown Engine", "Knowledge Base"]
+        },
+        {
+            id: "quizme",
+            title: "QuizMe",
+            badge: "Interactive Revision & PWA",
+            category: "Web Application",
+            icon: "🎓",
+            liveUrl: "https://amanbh2.github.io/quizme/",
+            description: "A fast, modular MCQ revision and examination prep platform designed for civil service aspirants. Features dynamic topic selection, interactive timelines, customized quiz timers, multi-theme aesthetics (Scholar, Dark, Light), and full offline PWA installation.",
+            tags: ["Vanilla JavaScript", "PWA", "Web Storage API", "Responsive UI", "CSS Variables"]
+        },
+        {
+            id: "bpscstar",
+            title: "BPSC STAR",
+            badge: "Exam PYQ Intelligence",
+            category: "Search & Discovery Engine",
+            icon: "⭐",
+            liveUrl: "https://amanbh2.github.io/bpscStar/",
+            description: "High-speed previous years' question (PYQ) search and indexing portal for BPSC Mains. Enables instantaneous keyword-driven retrieval, categorized paper drill-downs, and clean question exploration without distraction.",
+            tags: ["JavaScript", "Fast Search Indexing", "Material Symbols", "Responsive UI", "CSS Grid"]
+        },
+        {
+            id: "pop-the-bubble",
+            title: "Pop The Bubble",
+            badge: "Interactive Browser Game",
+            category: "Web Game Engine",
+            icon: "🫧",
+            liveUrl: "https://amanbh2.github.io/Pop-The-Bubble/",
+            description: "Vibrant, reflex-testing bubble-popping web game built purely with HTML, CSS keyframe physics, and vanilla JavaScript. Offers real-time hit detection, progressive score multipliers, fluid animations, and touch-optimized mobile gameplay.",
+            tags: ["HTML5 Canvas / DOM", "CSS Keyframes", "Game Loops", "Responsive Controls", "Audio Feedback"]
+        },
+        {
+            id: "upscstar",
+            title: "UPSC STAR",
+            badge: "Civil Services Question Engine",
+            category: "Question Intelligence Platform",
+            icon: "🏛️",
+            liveUrl: "https://amanbh2.github.io/UPSC-Star/",
+            description: "Comprehensive question search and analytics engine for UPSC Civil Services Examination. Catalogs and organizes questions across Prelims and Mains (GS-I to GS-IV, Essay) for rapid syllabus mapping and theme-based preparation.",
+            tags: ["JavaScript", "Search Algorithm", "Google Analytics", "Responsive Design", "Fast Filtering"]
+        }
+    ],
+
+    // Single consolidated LinkedIn verified credentials
     credentials: [
         {
-            title: "LinkedIn Skill Assessment: C",
-            issuer: "LinkedIn",
-            badge: "Verified Skill Badge",
-            description: "Passed LinkedIn's standardized C programming skill assessment."
+            title: "LinkedIn Skill Assessments",
+            issuer: "LinkedIn Standardized Assessments",
+            badge: "9 Verified Badges",
+            description: "Earned official verified skill badges by passing LinkedIn's standardized, time-limited technical competency assessments across systems programming, frontend development, graphic design, and productivity software.",
+            skills: [
+                "C",
+                "Python",
+                "Front-End Development",
+                "HTML",
+                "CSS",
+                "Adobe Illustrator",
+                "PowerPoint",
+                "Excel",
+                "Word"
+            ]
         }
     ]
 };
+

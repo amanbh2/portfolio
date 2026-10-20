@@ -514,16 +514,30 @@ function initTerminalCLI() {
 Available Commands:
   <span class="theme-accent-text">bio</span>        - Professional summary with accurate experience (${globalExperience.detailed})
   <span class="theme-accent-text">skills</span>     - Comprehensive list of technical competencies
+  <span class="theme-accent-text">projects</span>   - Web applications & tools (QuizMe, BPSC Star, Pop The Bubble, UPSC Star)
   <span class="theme-accent-text">exp</span>        - Career roadmap at Capgemini (joined Aug 4, 2022)
   <span class="theme-accent-text">journey</span>    - Geographic milestones (Supaul ➔ Raipur ➔ Gurugram)
   <span class="theme-accent-text">ha</span>         - Overview of gNodeB High Availability multi-CU-CP design
   <span class="theme-accent-text">sctp</span>       - Protocol decoupling of N2SCTP & F1SCTP from RRC
-  <span class="theme-accent-text">theme &lt;name&gt;</span>- Switch palette ('solar', 'aurora', 'tactical', 'cyber')
-  <span class="theme-accent-text">awards</span>     - Awards & honors (WOW Awards)
+  <span class="theme-accent-text">theme &lt;name&gt;</span>- Switch palette ('solar', 'aurora', 'tactical', 'cyber', 'daylight')
+  <span class="theme-accent-text">awards</span>     - Awards & verified credentials (WOW Awards & 9 LinkedIn Badges)
   <span class="theme-accent-text">contact</span>    - Direct contact channels
   <span class="theme-accent-text">download</span>   - Download Aman's Resume PDF
   <span class="theme-accent-text">clear</span>      - Clear terminal screen
   <span class="theme-accent-text">exit</span>       - Close terminal window
+        `,
+        projects: () => `
+🚀 <strong class="theme-accent-text">Featured Web Applications & Tools:</strong>
+1. <strong>Learning Hub:</strong> Structured 5G RAN & Systems engineering knowledge base.
+   🔗 <a href="https://amanbh2.github.io/learning/" target="_blank" class="theme-accent-text">https://amanbh2.github.io/learning/</a>
+2. <strong>QuizMe:</strong> Interactive MCQ revision tool & PWA for BPSC exam prep.
+   🔗 <a href="https://amanbh2.github.io/quizme/" target="_blank" class="theme-accent-text">https://amanbh2.github.io/quizme/</a>
+3. <strong>BPSC STAR:</strong> Fast search & indexing engine for BPSC Mains previous years' questions.
+   🔗 <a href="https://amanbh2.github.io/bpscStar/" target="_blank" class="theme-accent-text">https://amanbh2.github.io/bpscStar/</a>
+4. <strong>Pop The Bubble:</strong> Responsive reflex & browser game with dynamic animations.
+   🔗 <a href="https://amanbh2.github.io/Pop-The-Bubble/" target="_blank" class="theme-accent-text">https://amanbh2.github.io/Pop-The-Bubble/</a>
+5. <strong>UPSC STAR:</strong> Search & categorization platform for UPSC Civil Services questions.
+   🔗 <a href="https://amanbh2.github.io/UPSC-Star/" target="_blank" class="theme-accent-text">https://amanbh2.github.io/UPSC-Star/</a>
         `,
         bio: () => `
 <strong class="text-white">Aman Bhaskar</strong> — 5G RAN Software Engineer (${globalExperience.detailed} Experience)
