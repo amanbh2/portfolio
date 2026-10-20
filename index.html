@@ -3,17 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
     <title>Aman Bhaskar | 5G RAN Software Engineer</title>
     <meta name="description" content="Portfolio of Aman Bhaskar - 5G RAN Software Engineer specializing in CU Layer 3 (RRC, UECC, RRM), CU-CP High Availability, N2/F1 SCTP decoupling, 5G NR, and NB-IoT.">
     <meta name="keywords" content="Aman Bhaskar, 5G RAN, CU Layer 3, gNodeB, High Availability, N2SCTP, F1SCTP, Open RAN, RRC, UECC, RRM, NB-IoT, NTN, C, Python, Telecom Software Engineer">
     <meta name="author" content="Aman Bhaskar">
+    <link rel="canonical" href="https://amanbh2.github.io/portfolio/">
     
     <!-- Open Graph Metadata -->
     <meta property="og:title" content="Aman Bhaskar | 5G RAN Software Engineer">
     <meta property="og:description" content="Engineering carrier-grade 5G NR & NB-IoT CU Layer 3 protocol stacks, High Availability resiliency, and cellular mobility.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="res/aman.png">
+    <meta property="og:url" content="https://amanbh2.github.io/portfolio/">
+    <meta property="og:image" content="https://amanbh2.github.io/portfolio/res/aman.png">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Aman Bhaskar | 5G RAN Software Engineer">
+    <meta name="twitter:description" content="Engineering carrier-grade 5G NR & NB-IoT CU Layer 3 protocol stacks, High Availability resiliency, and cellular mobility.">
+    <meta name="twitter:image" content="https://amanbh2.github.io/portfolio/res/aman.png">
+
+    <!-- Immediate Theme Initialization (Prevents Light/Dark Mode Flash) -->
+    <script>
+        (function() {
+            try {
+                var saved = localStorage.getItem('aman_5g_theme');
+                if (saved && ['solar','aurora','tactical','cyber','daylight'].indexOf(saved) !== -1) {
+                    document.documentElement.setAttribute('data-theme', saved);
+                }
+            } catch (e) {}
+        })();
+    </script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -118,7 +138,7 @@
             <div class="nav-actions">
                 <!-- Theme Palette Switcher -->
                 <div class="theme-menu-container">
-                    <button class="btn-icon theme-toggle-btn" id="theme-toggle-btn" title="Switch Color Palette" aria-label="Change Theme">
+                    <button class="btn-icon theme-toggle-btn" id="theme-toggle-btn" title="Switch Color Palette" aria-label="Change Theme" aria-expanded="false" aria-controls="theme-dropdown">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"/>
                             <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
@@ -170,7 +190,7 @@
                 </a>
 
                 <!-- Mobile Hamburger -->
-                <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation menu">
+                <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -186,13 +206,6 @@
         <section class="section hero-section" id="about">
             <div class="hero-grid">
                 <div class="hero-content">
-                    <div class="status-pill glass-card">
-                        <span class="status-dot live"></span>
-                        <span class="mono-tag">CAPGEMINI // 5G RAN & RESILIENCY STACK</span>
-                        <span class="signal-bars">
-                            <span></span><span></span><span></span><span></span>
-                        </span>
-                    </div>
 
                     <h1 class="hero-title">
                         Architecting <span class="gradient-text">5G NR Layer 3</span> & Resilient Wireless Software
@@ -264,7 +277,7 @@
                     <div class="radar-card glass-card">
                         <div class="radar-header">
                             <div class="radar-led"></div>
-                            <span class="radar-title mono-tag">NODE STATUS: ACTIVE // gNodeB_CU_L3</span>
+                            <span class="radar-title mono-tag">NODE STATUS: ACTIVE</span>
                             <span class="radar-freq mono-tag">3.5 GHz (n78)</span>
                         </div>
 
@@ -309,12 +322,6 @@
                             <div class="floating-telemetry tag-1 mono-tag">
                                 <span class="telemetry-dot dot-primary"></span> RRC: CONNECTED
                             </div>
-                            <div class="floating-telemetry tag-2 mono-tag">
-                                <span class="telemetry-dot dot-secondary"></span> HA CU-CP: ACTIVE
-                            </div>
-                            <div class="floating-telemetry tag-3 mono-tag">
-                                <span class="telemetry-dot dot-tertiary"></span> NTN: SIB31 READY
-                            </div>
                         </div>
 
                         <div class="radar-stats">
@@ -336,7 +343,15 @@
             </div>
 
             <!-- Quantitative Impact Metrics Bar (Hydrated from data.js) -->
-            <div class="metrics-bar glass-card" id="metrics-bar-container"></div>
+            <div class="metrics-bar glass-card" id="metrics-bar-container">
+                <noscript>
+                    <div class="metric-item"><span class="metric-number theme-accent-text">4+</span><span class="metric-desc">Years 5G RAN Exp</span></div>
+                    <div class="metric-item"><span class="metric-number theme-accent-text">2x</span><span class="metric-desc">Capgemini WOW Winner</span></div>
+                    <div class="metric-item"><span class="metric-number text-white">8.71</span><span class="metric-desc">NIT Raipur Honours CGPA</span></div>
+                    <div class="metric-item"><span class="metric-number theme-sec-text">CU-CP</span><span class="metric-desc">Layer 3 Telecom Focus</span></div>
+                    <div class="metric-item"><span class="metric-number theme-accent-text">4</span><span class="metric-desc">Supaul ➔ Raipur ➔ BLR ➔ GGN</span></div>
+                </noscript>
+            </div>
         </section>
 
         <!-- System Design & Protocol Architecture Section -->
@@ -867,15 +882,36 @@
 
             <!-- Skill Filter Tabs -->
             <div class="skills-filter-tabs">
-                <button class="filter-tab active" data-filter="all">All Skills</button>
-                <button class="filter-tab" data-filter="telecom">5G NR Standards</button>
-                <button class="filter-tab" data-filter="cu">CU Protocols & Resiliency</button>
-                <button class="filter-tab" data-filter="systems">Systems & Protocols</button>
-                <button class="filter-tab" data-filter="devops">DevOps & Tooling</button>
+                <button class="filter-tab active" data-filter="all" aria-pressed="true">All Skills</button>
+                <button class="filter-tab" data-filter="telecom" aria-pressed="false">5G NR Standards</button>
+                <button class="filter-tab" data-filter="cu" aria-pressed="false">CU Protocols & Resiliency</button>
+                <button class="filter-tab" data-filter="systems" aria-pressed="false">Systems & Protocols</button>
+                <button class="filter-tab" data-filter="devops" aria-pressed="false">DevOps & Tooling</button>
             </div>
 
             <!-- Skill Cards Grid (Rendered dynamically from data.js) -->
-            <div class="skills-grid" id="skills-grid"></div>
+            <div class="skills-grid" id="skills-grid">
+                <noscript>
+                    <div class="skill-category glass-card">
+                        <div class="cat-header"><h3 class="cat-title">5G NR & Cellular Standards</h3></div>
+                        <div class="chips-container">
+                            <span class="skill-pill highlight">5G NR (New Radio)</span>
+                            <span class="skill-pill highlight">CU-CP Layer 3 Architecture</span>
+                            <span class="skill-pill highlight">gNodeB Architecture (CU / DU Split)</span>
+                            <span class="skill-pill highlight">NB-IoT & NTN SIB31</span>
+                        </div>
+                    </div>
+                    <div class="skill-category glass-card">
+                        <div class="cat-header"><h3 class="cat-title">CU Protocols & Resiliency</h3></div>
+                        <div class="chips-container">
+                            <span class="skill-pill highlight">CU-CP High Availability (HA)</span>
+                            <span class="skill-pill highlight">N2SCTP & F1SCTP Aggregators</span>
+                            <span class="skill-pill highlight">RRC / UECC / RRM</span>
+                            <span class="skill-pill highlight">Mobility (Xn, NG, DAPS)</span>
+                        </div>
+                    </div>
+                </noscript>
+            </div>
         </section>
 
         <!-- Education & Honors Section -->
@@ -1058,12 +1094,20 @@
         <div class="terminal-window glass-card">
             <div class="terminal-header">
                 <div class="term-dots">
-                    <button class="term-dot close" id="term-close-btn" title="Close Terminal"></button>
-                    <span class="term-dot min"></span>
-                    <span class="term-dot max"></span>
+                    <button class="term-dot close" id="term-close-btn" title="Close Terminal" aria-label="Close terminal"></button>
+                    <span class="term-dot min" aria-hidden="true"></span>
+                    <span class="term-dot max" aria-hidden="true"></span>
                 </div>
                 <div class="term-title mono-tag">aman@gNodeB-CU-L3: ~ (Type 'help' for commands)</div>
-                <div class="term-status mono-tag theme-sec-text">LIVE</div>
+                <div class="term-header-controls">
+                    <span class="term-status mono-tag theme-sec-text">LIVE</span>
+                    <button class="term-close-btn-visible" id="term-close-btn-action" aria-label="Close terminal" title="Close terminal">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="terminal-screen" id="terminal-output">
                 <div class="term-line welcome-text">

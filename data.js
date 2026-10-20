@@ -26,7 +26,7 @@ const PORTFOLIO_DATA = {
         { value: "2x", label: "Capgemini WOW Winner", highlight: "accent" },
         { value: "8.71", label: "NIT Raipur Honours CGPA", highlight: "white" },
         { value: "CU-CP", label: "Layer 3 Telecom Focus", highlight: "secondary" },
-        { value: "4", label: "Milestones (Supaul ➔ Raipur ➔ BLR ➔ GGN)", highlight: "accent" }
+        { value: "4", label: "Supaul ➔ Raipur ➔ BLR ➔ GGN", highlight: "accent" }
     ],
 
     // Geographic Milestones for India Map

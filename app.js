@@ -3,20 +3,48 @@
  * Interactive Systems & Dynamic Protocol Visualizer Engine
  */
 
+// Storage helper functions to ensure zero unhandled exceptions when storage is blocked
+function safeGetStorage(key, fallback) {
+    try {
+        return localStorage.getItem(key) || fallback;
+    } catch (e) {
+        return fallback;
+    }
+}
+
+function safeSetStorage(key, val) {
+    try {
+        localStorage.setItem(key, val);
+    } catch (e) {
+        // Silently catch private browsing / restricted cookie exceptions
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    initExperienceCalculator();
-    initThemeEngine();
-    initCanvasRF();
-    renderDynamicContent();
-    initProtocolInspector();
-    initSkillsFilter();
-    initMapInteractions();
-    initTerminalCLI();
-    initCopyActions();
-    initMobileNav();
-    initScrollSpy();
-    initContactForm();
-    initSatelliteInteractions();
+    // Run each initialization wrapped in try/catch for robust fault-tolerance
+    const inits = [
+        ['ExperienceCalculator', initExperienceCalculator],
+        ['ThemeEngine', initThemeEngine],
+        ['CanvasRF', initCanvasRF],
+        ['DynamicContent', renderDynamicContent],
+        ['ProtocolInspector', initProtocolInspector],
+        ['SkillsFilter', initSkillsFilter],
+        ['MapInteractions', initMapInteractions],
+        ['TerminalCLI', initTerminalCLI],
+        ['CopyActions', initCopyActions],
+        ['MobileNav', initMobileNav],
+        ['ScrollSpy', initScrollSpy],
+        ['ContactForm', initContactForm],
+        ['SatelliteInteractions', initSatelliteInteractions]
+    ];
+
+    inits.forEach(([name, fn]) => {
+        try {
+            fn();
+        } catch (err) {
+            console.warn(`[Aman.5G] Warning during ${name} initialization:`, err);
+        }
+    });
 });
 
 /* ==========================================================================
@@ -58,25 +86,27 @@ function initExperienceCalculator() {
 }
 
 /* ==========================================================================
-   2. Theme Engine (Solar Amber, Aurora Emerald, Tactical Orange, Cyber Cyan)
+   2. Theme Engine (Solar Amber, Aurora Emerald, Tactical Orange, Cyber Cyan, Daylight Crisp)
    ========================================================================== */
 function initThemeEngine() {
     const toggleBtn = document.getElementById('theme-toggle-btn');
     const dropdown = document.getElementById('theme-dropdown');
     const themeOpts = document.querySelectorAll('.theme-opt');
 
-    const savedTheme = localStorage.getItem('aman_5g_theme') || 'solar';
+    const savedTheme = safeGetStorage('aman_5g_theme', 'solar');
     setTheme(savedTheme);
 
     if (toggleBtn && dropdown) {
         toggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            dropdown.classList.toggle('open');
+            const isOpen = dropdown.classList.toggle('open');
+            toggleBtn.setAttribute('aria-expanded', String(isOpen));
         });
 
         document.addEventListener('click', (e) => {
             if (!dropdown.contains(e.target) && e.target !== toggleBtn) {
                 dropdown.classList.remove('open');
+                toggleBtn.setAttribute('aria-expanded', 'false');
             }
         });
     }
@@ -85,14 +115,17 @@ function initThemeEngine() {
         opt.addEventListener('click', () => {
             const theme = opt.getAttribute('data-set-theme');
             setTheme(theme);
-            if (dropdown) dropdown.classList.remove('open');
+            if (dropdown) {
+                dropdown.classList.remove('open');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+            }
         });
     });
 
     function setTheme(themeName) {
-        if (!PORTFOLIO_DATA.themes[themeName]) return;
+        if (!themeName || !Object.hasOwn(PORTFOLIO_DATA.themes, themeName)) return;
         document.documentElement.setAttribute('data-theme', themeName);
-        localStorage.setItem('aman_5g_theme', themeName);
+        safeSetStorage('aman_5g_theme', themeName);
 
         themeOpts.forEach((btn) => {
             if (btn.getAttribute('data-set-theme') === themeName) {
@@ -130,14 +163,22 @@ function renderMetrics() {
     const container = document.getElementById('metrics-bar-container');
     if (!container) return;
 
-    // Build metrics dynamically with calculated experience & hometown journey
-    const metrics = [
-        { value: globalExperience.formatted, label: 'Years 5G RAN Exp', cls: 'theme-accent-text' },
-        { value: '2x', label: 'Capgemini WOW Winner', cls: 'theme-accent-text' },
-        { value: '8.71', label: 'NIT Raipur Honours CGPA', cls: 'text-white' },
-        { value: 'CU-CP', label: 'Layer 3 Telecom Focus', cls: 'theme-sec-text' },
-        { value: '3', label: 'Supaul ➔ Raipur ➔ Gurugram', cls: 'theme-accent-text' }
-    ];
+    // Build metrics dynamically from PORTFOLIO_DATA.metrics
+    const metrics = (PORTFOLIO_DATA.metrics || []).map((m, idx) => {
+        let val = m.value;
+        if (idx === 0) {
+            val = globalExperience.years + '+';
+        }
+        let cls = 'theme-accent-text';
+        if (m.highlight === 'white') cls = 'text-white';
+        else if (m.highlight === 'secondary') cls = 'theme-sec-text';
+
+        return {
+            value: val,
+            label: m.label,
+            cls: cls
+        };
+    });
 
     container.innerHTML = metrics
         .map((m, idx) => `
@@ -146,25 +187,6 @@ function renderMetrics() {
                 <span class="metric-desc">${m.label}</span>
             </div>
             ${idx < metrics.length - 1 ? '<div class="metric-divider"></div>' : ''}
-        `)
-        .join('');
-}
-
-function renderExperiencePillars() {
-    const container = document.getElementById('experience-pillars-container');
-    if (!container) return;
-
-    container.innerHTML = PORTFOLIO_DATA.experiencePillars
-        .map((pillar) => `
-            <div class="exp-pillar glass-inner">
-                <div class="pillar-head">
-                    <span class="pillar-icon theme-accent-text">${pillar.icon}</span>
-                    <h4 class="pillar-title">${pillar.title}</h4>
-                </div>
-                <ul class="pillar-points">
-                    ${pillar.points.map((pt) => `<li>${pt}</li>`).join('')}
-                </ul>
-            </div>
         `)
         .join('');
 }
@@ -191,38 +213,54 @@ function renderSkillsGrid() {
 }
 
 /* ==========================================================================
-   4. India Map & Milestone Interactions
+   4. India Map & Geographic Milestone Interactions (Unified & Accessible)
    ========================================================================== */
 function initMapInteractions() {
-    const nodes = document.querySelectorAll('.map-node');
+    const mapNodes = document.querySelectorAll('.map-node');
     const milestoneCards = document.querySelectorAll('.milestone-card');
 
-    function setActiveMilestone(cityId) {
-        milestoneCards.forEach((card) => {
-            if (card.getAttribute('data-highlight') === cityId) {
-                card.classList.add('active');
-                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                card.classList.remove('active');
+    function highlightMilestone(id, userClickedMap = false) {
+        let targetCard = null;
+        milestoneCards.forEach((c) => {
+            const isMatch = c.getAttribute('data-highlight') === id;
+            c.classList.toggle('active', isMatch);
+            if (isMatch) targetCard = c;
+        });
+
+        mapNodes.forEach((n) => {
+            const isMatch = n.getAttribute('data-node') === id;
+            if (isMatch) {
+                n.classList.add('active-node');
+                setTimeout(() => n.classList.remove('active-node'), 1000);
             }
         });
+
+        const cityData = PORTFOLIO_DATA.journey.find((j) => j.id === id);
+        if (cityData && userClickedMap) {
+            showToast(`📍 ${cityData.city}: ${cityData.title}`);
+        }
+
+        // Only scroll if milestone card is currently outside the visible viewport
+        if (targetCard) {
+            const rect = targetCard.getBoundingClientRect();
+            const isVisible = rect.top >= 90 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+            if (!isVisible) {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
     }
 
-    nodes.forEach((node) => {
-        const cityId = node.getAttribute('data-node');
+    mapNodes.forEach((node) => {
         node.addEventListener('click', () => {
-            setActiveMilestone(cityId);
-            const cityData = PORTFOLIO_DATA.journey.find((j) => j.id === cityId);
-            if (cityData) {
-                showToast(`📍 ${cityData.city}: ${cityData.title}`);
-            }
+            const nodeId = node.getAttribute('data-node');
+            highlightMilestone(nodeId, true);
         });
     });
 
     milestoneCards.forEach((card) => {
         card.addEventListener('click', () => {
-            const cityId = card.getAttribute('data-highlight');
-            setActiveMilestone(cityId);
+            const milestoneId = card.getAttribute('data-highlight');
+            highlightMilestone(milestoneId, false);
         });
     });
 }
@@ -235,13 +273,26 @@ function initCanvasRF() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let animId = null;
+    let isPaused = false;
 
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    });
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+
+    function setCanvasDimensions() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    setCanvasDimensions();
 
     const nodes = [];
     const nodeCount = Math.min(Math.floor((width * height) / 25000), 45);
@@ -258,6 +309,18 @@ function initCanvasRF() {
         });
     }
 
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            setCanvasDimensions();
+            nodes.forEach((node) => {
+                node.x = Math.max(10, Math.min(width - 10, node.x));
+                node.y = Math.max(10, Math.min(height - 10, node.y));
+            });
+        }, 150);
+    });
+
     let mouse = { x: -1000, y: -1000 };
     window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
@@ -271,6 +334,7 @@ function initCanvasRF() {
     window.updateCanvasTheme = () => {};
 
     function draw() {
+        if (isPaused || reducedMotion) return;
         ctx.clearRect(0, 0, width, height);
         const accent = getAccentColor();
 
@@ -328,10 +392,22 @@ function initCanvasRF() {
             ctx.fill();
         });
 
-        requestAnimationFrame(draw);
+        animId = requestAnimationFrame(draw);
     }
 
-    draw();
+    if (!reducedMotion) {
+        animId = requestAnimationFrame(draw);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                isPaused = true;
+                if (animId) cancelAnimationFrame(animId);
+            } else {
+                isPaused = false;
+                animId = requestAnimationFrame(draw);
+            }
+        });
+    }
 }
 
 /* ==========================================================================
@@ -350,51 +426,66 @@ function initProtocolInspector() {
     const inspectorLang = document.getElementById('inspector-lang');
     const inspectorCard = document.getElementById('inspector-display');
 
-    function updateInspector(key) {
+    let inspectTimeout = null;
+
+    function updateInspector(key, userInitiated = false) {
+        if (!key || !Object.hasOwn(PORTFOLIO_DATA.architecture, key)) return;
         const data = PORTFOLIO_DATA.architecture[key];
-        if (!data) return;
+
+        // Keep active states synchronized across both module buttons and feature chips
+        moduleBtns.forEach((b) => {
+            b.classList.toggle('active', b.getAttribute('data-module') === key);
+        });
+        featureChips.forEach((c) => {
+            c.classList.toggle('active', c.getAttribute('data-feature') === key);
+        });
+
+        if (inspectTimeout) clearTimeout(inspectTimeout);
 
         if (inspectorCard) {
             inspectorCard.style.opacity = '0.4';
-            setTimeout(() => {
-                inspectorId.textContent = data.id;
-                inspectorBadge.textContent = data.badge;
-                inspectorHeading.textContent = data.heading;
-                inspectorSummary.textContent = data.summary;
-                inspectorSpec.textContent = data.spec;
-                inspectorLang.textContent = data.lang;
+            inspectTimeout = setTimeout(() => {
+                if (inspectorId) inspectorId.textContent = data.id;
+                if (inspectorBadge) inspectorBadge.textContent = data.badge;
+                if (inspectorHeading) inspectorHeading.textContent = data.heading;
+                if (inspectorSummary) inspectorSummary.textContent = data.summary;
+                if (inspectorSpec) inspectorSpec.textContent = data.spec;
+                if (inspectorLang) inspectorLang.textContent = data.lang;
 
-                inspectorBullets.innerHTML = '';
-                data.bullets.forEach((b) => {
-                    const li = document.createElement('li');
-                    li.textContent = b;
-                    inspectorBullets.appendChild(li);
-                });
+                if (inspectorBullets) {
+                    inspectorBullets.innerHTML = '';
+                    data.bullets.forEach((b) => {
+                        const li = document.createElement('li');
+                        li.textContent = b;
+                        inspectorBullets.appendChild(li);
+                    });
+                }
 
                 inspectorCard.style.opacity = '1';
+
+                // On tablet/mobile screen viewports, scroll inspector into view if user tapped a chip
+                if (userInitiated && window.innerWidth <= 1024) {
+                    inspectorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
             }, 120);
         }
     }
 
     moduleBtns.forEach((btn) => {
         btn.addEventListener('click', () => {
-            moduleBtns.forEach((b) => b.classList.remove('active'));
-            featureChips.forEach((c) => c.classList.remove('active'));
-            btn.classList.add('active');
-            updateInspector(btn.getAttribute('data-module'));
+            const key = btn.getAttribute('data-module');
+            updateInspector(key, true);
         });
     });
 
     featureChips.forEach((chip) => {
         chip.addEventListener('click', () => {
-            moduleBtns.forEach((b) => b.classList.remove('active'));
-            featureChips.forEach((c) => c.classList.remove('active'));
-            chip.classList.add('active');
-            updateInspector(chip.getAttribute('data-feature'));
+            const key = chip.getAttribute('data-feature');
+            updateInspector(key, true);
         });
     });
 
-    window.inspectProtocol = updateInspector;
+    window.inspectProtocol = (key, userInitiated = false) => updateInspector(key, userInitiated);
 }
 
 /* ==========================================================================
@@ -405,8 +496,12 @@ function initSkillsFilter() {
 
     tabs.forEach((tab) => {
         tab.addEventListener('click', () => {
-            tabs.forEach((t) => t.classList.remove('active'));
+            tabs.forEach((t) => {
+                t.classList.remove('active');
+                t.setAttribute('aria-pressed', 'false');
+            });
             tab.classList.add('active');
+            tab.setAttribute('aria-pressed', 'true');
 
             const filter = tab.getAttribute('data-filter');
             const cards = document.querySelectorAll('.skill-category');
@@ -428,55 +523,14 @@ function initSkillsFilter() {
 }
 
 /* ==========================================================================
-   7.5 Geographic Milestones & India Map Interaction
-   ========================================================================== */
-function initMapInteractions() {
-    const mapNodes = document.querySelectorAll('.map-node');
-    const milestoneCards = document.querySelectorAll('.milestone-card');
-
-    mapNodes.forEach((node) => {
-        node.addEventListener('click', () => {
-            const nodeId = node.getAttribute('data-node');
-            highlightMilestone(nodeId);
-        });
-    });
-
-    milestoneCards.forEach((card) => {
-        card.addEventListener('click', () => {
-            const milestoneId = card.getAttribute('data-highlight');
-            highlightMilestone(milestoneId);
-        });
-    });
-
-    function highlightMilestone(id) {
-        milestoneCards.forEach((c) => {
-            if (c.getAttribute('data-highlight') === id) {
-                c.classList.add('active');
-                c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                c.classList.remove('active');
-            }
-        });
-
-        mapNodes.forEach((n) => {
-            if (n.getAttribute('data-node') === id) {
-                n.style.transform = 'scale(1.25)';
-                setTimeout(() => {
-                    n.style.transform = '';
-                }, 1000);
-            }
-        });
-    }
-}
-
-/* ==========================================================================
    8. Interactive Terminal CLI ("Aman Shell")
    ========================================================================== */
 function initTerminalCLI() {
     const toggleBtn = document.getElementById('terminal-toggle-btn');
     const modal = document.getElementById('terminal-modal');
     const overlay = document.getElementById('terminal-overlay');
-    const closeBtn = document.getElementById('term-close-btn');
+    const closeDotBtn = document.getElementById('term-close-btn');
+    const closeActionBtn = document.getElementById('term-close-btn-action');
     const input = document.getElementById('terminal-input');
     const output = document.getElementById('terminal-output');
 
@@ -485,17 +539,29 @@ function initTerminalCLI() {
     function openTerminal() {
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
         setTimeout(() => input.focus(), 150);
     }
 
     function closeTerminal() {
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
     }
 
     if (toggleBtn) toggleBtn.addEventListener('click', openTerminal);
     if (overlay) overlay.addEventListener('click', closeTerminal);
-    if (closeBtn) closeBtn.addEventListener('click', closeTerminal);
+    if (closeDotBtn) closeDotBtn.addEventListener('click', closeTerminal);
+    if (closeActionBtn) closeActionBtn.addEventListener('click', closeTerminal);
+
+    // Ensure terminal stays fully visible if virtual on-screen keyboard resizes viewport
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            if (modal.classList.contains('active')) {
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+    }
 
     window.addEventListener('keydown', (e) => {
         if ((e.ctrlKey && e.key === '`') || e.key === 'F2') {
@@ -514,9 +580,9 @@ function initTerminalCLI() {
 Available Commands:
   <span class="theme-accent-text">bio</span>        - Professional summary with accurate experience (${globalExperience.detailed})
   <span class="theme-accent-text">skills</span>     - Comprehensive list of technical competencies
-  <span class="theme-accent-text">projects</span>   - Web applications & tools (QuizMe, BPSC Star, Pop The Bubble, UPSC Star)
+  <span class="theme-accent-text">projects</span>   - Web applications & tools (Learning Hub, QuizMe, BPSC Star, Pop The Bubble, UPSC Star)
   <span class="theme-accent-text">exp</span>        - Career roadmap at Capgemini (joined Aug 4, 2022)
-  <span class="theme-accent-text">journey</span>    - Geographic milestones (Supaul ➔ Raipur ➔ Gurugram)
+  <span class="theme-accent-text">journey</span>    - Geographic milestones (Supaul ➔ Raipur ➔ Bengaluru ➔ Gurugram)
   <span class="theme-accent-text">ha</span>         - Overview of gNodeB High Availability multi-CU-CP design
   <span class="theme-accent-text">sctp</span>       - Protocol decoupling of N2SCTP & F1SCTP from RRC
   <span class="theme-accent-text">theme &lt;name&gt;</span>- Switch palette ('solar', 'aurora', 'tactical', 'cyber', 'daylight')
@@ -582,12 +648,12 @@ Decoupled transport and application layers by splitting out NGAP and F1AP from R
 • Internal IPC provides clean, modular message dispatch to and from RRC.
         `,
         theme: (arg) => {
-            if (!arg) return `Usage: theme [solar | aurora | tactical | cyber]`;
-            if (PORTFOLIO_DATA.themes[arg]) {
+            if (!arg) return `Usage: theme [solar | aurora | tactical | cyber | daylight]`;
+            if (Object.hasOwn(PORTFOLIO_DATA.themes, arg)) {
                 window.switchTheme(arg);
                 return `🎨 Switched palette to: <strong>${PORTFOLIO_DATA.themes[arg].name}</strong>`;
             }
-            return `Available palettes: solar, aurora, tactical, cyber`;
+            return `Available palettes: solar, aurora, tactical, cyber, daylight`;
         },
         awards: () => `
 🏆 <strong class="theme-accent-text">Capgemini WOW Award × 2</strong>
@@ -632,7 +698,8 @@ high-quality feature implementations, and dependable engineering leadership acro
             output.appendChild(userLine);
 
             let responseHtml = '';
-            if (commands[cmd]) {
+            // Safe property lookup preventing Object prototype pollution
+            if (Object.hasOwn(commands, cmd)) {
                 responseHtml = commands[cmd](arg);
             } else {
                 responseHtml = `<span style="color: #ef4444;">Command not recognized: '${escapeHtml(cmd)}'. Type <span class="theme-accent-text">'help'</span> for list of commands.</span>`;
@@ -682,7 +749,7 @@ function initSatelliteInteractions() {
             archSection.scrollIntoView({ behavior: 'smooth' });
         }
         if (window.inspectProtocol) {
-            window.inspectProtocol('sib31');
+            window.inspectProtocol('sib31', true);
         }
         showToast('🛰️ NTN Satellite Link: Inspected SIB31 module!');
     });
@@ -761,12 +828,14 @@ function initMobileNav() {
         e.stopPropagation();
         const isOpen = navLinks.classList.toggle('mobile-open');
         hamburger.classList.toggle('is-active', isOpen);
+        hamburger.setAttribute('aria-expanded', String(isOpen));
     });
 
     navLinks.querySelectorAll('.nav-link').forEach((link) => {
         link.addEventListener('click', () => {
             navLinks.classList.remove('mobile-open');
             hamburger.classList.remove('is-active');
+            hamburger.setAttribute('aria-expanded', 'false');
         });
     });
 
@@ -774,36 +843,67 @@ function initMobileNav() {
         if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
             navLinks.classList.remove('mobile-open');
             hamburger.classList.remove('is-active');
+            hamburger.setAttribute('aria-expanded', 'false');
         }
     });
 }
 
 /* ==========================================================================
-   12. ScrollSpy Active Link Tracking
+   12. ScrollSpy Active Link Tracking (Observer-driven, Zero Layout Thrash)
    ========================================================================== */
 function initScrollSpy() {
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
 
-    window.addEventListener('scroll', () => {
-        let currentSectionId = '';
-        const scrollPosition = window.pageYOffset + 200;
-
-        sections.forEach((section) => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                currentSectionId = section.getAttribute('id');
-            }
-        });
-
+    function setActiveLink(id) {
+        if (!id) return;
         navLinks.forEach((link) => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${currentSectionId}`) {
-                link.classList.add('active');
+            const isMatch = link.getAttribute('href') === `#${id}`;
+            link.classList.toggle('active', isMatch);
+        });
+    }
+
+    if ('IntersectionObserver' in window) {
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -65% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveLink(entry.target.getAttribute('id'));
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach((section) => observer.observe(section));
+    } else {
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    let currentId = '';
+                    const scrollPos = (window.pageYOffset || document.documentElement.scrollTop) + 200;
+                    sections.forEach((sec) => {
+                        if (scrollPos >= sec.offsetTop && scrollPos < sec.offsetTop + sec.offsetHeight) {
+                            currentId = sec.getAttribute('id');
+                        }
+                    });
+                    if (currentId) setActiveLink(currentId);
+                    ticking = false;
+                });
+                ticking = true;
             }
         });
-    });
+    }
+
+    // Set initial active state based on hash or default to about
+    const currentHash = (window.location.hash || '').replace('#', '');
+    if (currentHash) {
+        setActiveLink(currentHash);
+    }
 
     const yearSpan = document.getElementById('current-year');
     if (yearSpan) {
@@ -812,7 +912,7 @@ function initScrollSpy() {
 }
 
 /* ==========================================================================
-   13. Contact Dispatch Form Handler
+   13. Contact Dispatch Form Handler (With Validation & Clipboard Fallback)
    ========================================================================== */
 function initContactForm() {
     const form = document.getElementById('contact-form');
@@ -821,19 +921,40 @@ function initContactForm() {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const name = document.getElementById('sender-name').value.trim();
-        const email = document.getElementById('sender-email').value.trim();
-        const subject = document.getElementById('sender-subject').value.trim();
-        const message = document.getElementById('sender-message').value.trim();
+        const nameInput = document.getElementById('sender-name');
+        const emailInput = document.getElementById('sender-email');
+        const subjectInput = document.getElementById('sender-subject');
+        const messageInput = document.getElementById('sender-message');
+
+        const name = nameInput ? nameInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const subject = subjectInput ? subjectInput.value.trim() : '';
+        const message = messageInput ? messageInput.value.trim() : '';
 
         if (!name || !email || !message) {
-            alert('Please fill out all required fields.');
+            showToast('⚠️ Please fill out Name, Email, and Message.');
+            if (!name && nameInput) nameInput.focus();
+            else if (!email && emailInput) emailInput.focus();
+            else if (!message && messageInput) messageInput.focus();
             return;
         }
 
-        const mailtoUrl = `mailto:${PORTFOLIO_DATA.profile.email}?subject=${encodeURIComponent(subject || '5G Stack Discussion')}&body=${encodeURIComponent(`From: ${name} (${email})\n\nMessage:\n${message}`)}`;
-        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showToast('⚠️ Please enter a valid email address.');
+            if (emailInput) emailInput.focus();
+            return;
+        }
+
+        const bodyContent = `From: ${name} (${email})\n\nMessage:\n${message}`;
+        const mailtoUrl = `mailto:${PORTFOLIO_DATA.profile.email}?subject=${encodeURIComponent(subject || '5G Stack Discussion')}&body=${encodeURIComponent(bodyContent)}`;
+
+        // Also copy formatted message to clipboard as seamless fallback
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(bodyContent).catch(() => {});
+        }
+
         window.location.href = mailtoUrl;
-        showToast('Launching email client for direct dispatch...');
+        showToast('✉️ Opening email client (message also copied to clipboard)');
     });
 }
